@@ -12,6 +12,9 @@ def generate_instance(options)
     end
 
     ps = (n.to_f * options[:part_sz]).to_i
+
+    return if ps == 0
+
     v = 0.upto(n - 1).to_a.shuffle
     partitions = []
 
