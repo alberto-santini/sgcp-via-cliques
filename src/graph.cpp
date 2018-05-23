@@ -15,6 +15,7 @@
 
 namespace sgcp_cliques {
     namespace {
+        // Turns each cluster into a clique.
         void add_partition_cliques(ClusteredGraph& graph) {
             for(auto v = 0u; v < boost::num_vertices(graph); ++v) {
                 for(auto w = v + 1; w < boost::num_vertices(graph); ++w) {
@@ -27,6 +28,10 @@ namespace sgcp_cliques {
             }
         }
 
+        // Check if a pair of arcs corresponding to the edges {v1, v2}, {w1, w2} is simplicial.
+        // First we determine the correct orientation of each arc, i.e. if the corresponding arcs
+        // are, say, (v1, v2) or (v2, v1). Then we check if they form a simplicial pair, i.e.
+        // they have the same origin and their destinations are linked, in either direction.
         bool is_simplicial_pair(std::size_t v1, std::size_t v2, std::size_t w1, std::size_t w2, const DirectedGraph& dgraph) {
             const auto [e, e_present] = boost::edge(
                 std::min(v1, v2), std::max(v1, v2), dgraph
@@ -127,13 +132,16 @@ namespace sgcp_cliques {
         }
 
         for(auto e = 0u; e < boost::num_vertices(lgraph); ++e) {
+            // Clusters of the endpoints of the first edge.
             const auto cl_e1 = cgraph[lgraph[e].first];
             const auto cl_e2 = cgraph[lgraph[e].second];
 
             for(auto f = e + 1; f < boost::num_vertices(lgraph); ++f) {
+                // Clusters of the endpoints of the second edge.
                 const auto cl_f1 = cgraph[lgraph[f].first];
                 const auto cl_f2 = cgraph[lgraph[f].second];
 
+                // If they have two endpoints in one same cluster, add the edge.
                 if(cl_e1 == cl_f1 || cl_e1 == cl_f2 || cl_e2 == cl_f1 || cl_e2 == cl_f2) {
                     boost::add_edge(e, f, lgraph);
                 }
@@ -155,13 +163,17 @@ namespace sgcp_cliques {
         for(auto e = 0u; e < boost::num_vertices(slgraph); ++e) {
             slgraph[e] = lgraph[e];
 
+            // The two endpoints of the first edge.
             const auto e_vertex_1 = lgraph[e].first;
             const auto e_vertex_2 = lgraph[e].second;
 
             for(auto f = e + 1; f < boost::num_vertices(slgraph); ++f) {
+                // The two endpoints of the second edge.
                 const auto f_vertex_1 = lgraph[f].first;
                 const auto f_vertex_2 = lgraph[f].second;
 
+                // Add an edge if there was an edge in the line graph, and
+                // the pair is not simplicial.
                 if( boost::edge(e, f, lgraph).second &&
                     ! is_simplicial_pair(e_vertex_1, e_vertex_2, f_vertex_1, f_vertex_2, dgraph)
                 ) {
