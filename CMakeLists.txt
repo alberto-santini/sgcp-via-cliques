@@ -19,6 +19,7 @@ set(LINKER_OPTIONS       -flto -Wl,--no-as-needed)
 
 find_package(Boost REQUIRED)
 find_package(AS REQUIRED)
+find_package(PMC REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Cplex REQUIRED)
 
@@ -30,7 +31,7 @@ target_compile_options(     sgcp_cliques PRIVATE $<$<CONFIG:DEBUG>:${DEBUG_OPTIO
 target_link_libraries(      sgcp_cliques PRIVATE ${LINKER_OPTIONS})
 target_link_libraries(      sgcp_cliques PRIVATE Boost::boost)
 target_link_libraries(      sgcp_cliques PRIVATE Cplex::cplex)
-target_link_libraries(      sgcp_cliques PRIVATE AS::AS)
+target_link_libraries(      sgcp_cliques PRIVATE Pmc::pmc)
 target_link_libraries(      sgcp_cliques PRIVATE Threads::Threads)
 target_link_libraries(      sgcp_cliques PRIVATE stdc++fs)
 target_link_libraries(      sgcp_cliques PRIVATE dl)
