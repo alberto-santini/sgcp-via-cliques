@@ -19,6 +19,7 @@ set(LINKER_OPTIONS       -flto -Wl,--no-as-needed)
 
 find_package(Boost REQUIRED)
 find_package(AS REQUIRED)
+find_package(PO REQUIRED)
 find_package(PMC REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Cplex REQUIRED)
