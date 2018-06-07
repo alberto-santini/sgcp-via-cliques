@@ -40,6 +40,9 @@ namespace sgcp_cliques {
             std::size_t // Graph property: number of clusters.
     >;
 
+    // Return the number of partitions, which is stored as a graph property.
+    inline std::size_t number_of_partitions(const ClusteredGraph& cgraph) { return cgraph[boost::graph_bundle]; }
+
     // Reads a clustered graph from file.
     // First line: the number N of vertices;
     // Second line: the number M of edges;

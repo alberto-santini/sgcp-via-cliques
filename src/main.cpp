@@ -61,22 +61,16 @@ int main(int argc, char* argv[]) {
     }
 
     const auto cgraph = read_clustered_graph(graph_file);
-        const auto working_graph = as::graph::complementary(cgraph);
-        const auto clique_graph = complementary_sandwich_line_graph(working_graph);
-
-        const auto start_time = high_resolution_clock::now();
-        const auto max_clique = as::max_clique::solve_with_mip(clique_graph);
-        const auto end_time = high_resolution_clock::now();
-        const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
+    const auto working_graph = as::graph::complementary(cgraph);
+    const auto clique_graph = complementary_sandwich_line_graph(working_graph);
+    const auto start_time = high_resolution_clock::now();
+    const auto max_clique = as::max_clique::solve_with_mip(clique_graph);
+    const auto end_time = high_resolution_clock::now();
+    const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
+    const auto chromatic_n = number_of_partitions(cgraph) - max_clique.size();
     const auto instance = fs::path{graph_file}.stem().string();
 
-        if(!ofs.fail()) {
-            ofs << instance << "," << chromatic_n << "," << elapsed << "\n";
-        }
-
-        return 0;
-    } else {
-        std::cerr << "Usage: " << argv[0] << " <graph> <results_file>\n";
-        return 1;
-    }
+    ofs << instance << "," << chromatic_n << "," << elapsed << "\n";
+    
+    return 0;
 }
