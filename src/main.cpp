@@ -9,6 +9,7 @@
 #include <po/ProgramOptions.hxx>
 #include <fstream>
 #include <chrono>
+#include <optional>
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem;
@@ -31,6 +32,11 @@ int main(int argc, char* argv[]) {
         .description("File where we append the results. Mandatory.")
         .type(po::string);
 
+    parser["cplex-timeout"]
+        .abbreviation('t')
+        .description("Timeout when solving the max-clique problem with CPLEX.")
+        .type(po::f32);
+
     parser["help"]
         .abbreviation('h')
         .description("Prints this help text.")
@@ -44,6 +50,12 @@ int main(int argc, char* argv[]) {
 
     if(!parser["output"].was_set()) {
         std::cerr << "You need to specify an output file!" << and_die();
+    }
+
+    std::optional<float> cplex_timeout = std::nullopt;
+
+    if(parser["cplex-timeout"].was_set()) {
+        cplex_timeout = parser["cplex-timeout"].get().f32;
     }
 
     std::string graph_file = parser["graph"].get().string;
@@ -64,7 +76,7 @@ int main(int argc, char* argv[]) {
     const auto working_graph = as::graph::complementary(cgraph);
     const auto clique_graph = complementary_sandwich_line_graph(working_graph);
     const auto start_time = high_resolution_clock::now();
-    const auto max_clique = as::max_clique::solve_with_mip(clique_graph);
+    const auto max_clique = as::max_clique::solve_with_mip(clique_graph, cplex_timeout);
     const auto end_time = high_resolution_clock::now();
     const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
     const auto chromatic_n = number_of_partitions(cgraph) - max_clique.size();
