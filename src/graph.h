@@ -11,12 +11,18 @@
 #define SGCP_VIA_CLIQUES_GRAPH_H
 
 namespace sgcp_cliques {
+    // Struct used to keep track of the clusters in a clusterd graph.
+    struct ClusteredGraphProperties {
+        std::size_t num_clusters;
+        std::vector<std::vector<std::size_t>> clusters;
+    };
+
     // Type to represent the underlying graph for the SGCP.
     using ClusteredGraph = boost::adjacency_list<
             boost::vecS, boost::vecS, boost::undirectedS,
             std::size_t, // Vertex property: cluster number for the vertex.
             boost::no_property, // No edge property.
-            std::size_t // Graph property: number of clusters.
+            ClusteredGraphProperties // Graph property: number of clusters.
     >;
 
     // Type to represent the line graph of the original graph.
@@ -37,11 +43,11 @@ namespace sgcp_cliques {
             boost::vecS, boost::vecS, boost::directedS,
             std::size_t, // Vertex property: cluster number for the vertex.
             boost::no_property, // No edge property.
-            std::size_t // Graph property: number of clusters.
+            ClusteredGraphProperties // Graph property: number of clusters.
     >;
 
     // Return the number of partitions, which is stored as a graph property.
-    inline std::size_t number_of_partitions(const ClusteredGraph& cgraph) { return cgraph[boost::graph_bundle]; }
+    inline std::size_t number_of_partitions(const ClusteredGraph& cgraph) { return cgraph[boost::graph_bundle].num_clusters; }
 
     // Reads a clustered graph from file.
     // First line: the number N of vertices;

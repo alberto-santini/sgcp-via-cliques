@@ -67,7 +67,7 @@ namespace sgcp_cliques {
             std::exit(1);
         }
 
-        std::size_t num_vertices, num_edges, num_partitions;
+        std::size_t num_vertices, num_edges, num_clusters;
 
         if(!(ifs >> num_vertices)) {
             std::cerr << "Cannot read number of vertices from " << graph_file << and_die();
@@ -77,12 +77,12 @@ namespace sgcp_cliques {
             std::cerr << "Cannot read number of edges from " << graph_file << and_die();
         }
 
-        if(!(ifs >> num_partitions)) {
+        if(!(ifs >> num_clusters)) {
             std::cerr << "Cannot read number of partitions from " << graph_file << and_die();
         }
 
         ClusteredGraph graph;
-        graph[boost::graph_bundle] = num_partitions;
+        std::vector<std::vector<std::size_t>> clusters(num_clusters);
 
         as::repeat(num_vertices, [&] () { boost::add_vertex(graph); });
 
@@ -101,20 +101,22 @@ namespace sgcp_cliques {
 
         ifs >> std::ws;
 
-        for(auto partition = 0u; partition < num_partitions; ++partition) {
+        for(auto cluster = 0u; cluster < num_clusters; ++cluster) {
             std::getline(ifs, line);
             ss.str(line);
 
             std::size_t vertex;
 
             while(ss >> vertex) {
-                graph[vertex] = partition;
+                graph[vertex] = cluster;
+                clusters[cluster].push_back(vertex);
             }
 
             ss.str("");
             ss.clear();
         }
 
+        graph[boost::graph_bundle] = { num_clusters, clusters };
         add_partition_cliques(graph);
 
         return graph;
@@ -151,8 +153,18 @@ namespace sgcp_cliques {
         return lgraph;
     }
 
-    DirectedGraph directed_acyclic(const ClusteredGraph &cgraph) {
-        return as::graph::acyclic_orientation(cgraph);
+    DirectedGraph directed_acyclic(const ClusteredGraph& cgraph) {
+        // True iff the first vertex has larger degree than the second vertex.
+        const auto vertex_order = [&cgraph] (const auto& v1, const auto& v2) -> bool {
+            const auto cluster_v1 = cgraph[v1];
+            const auto cluster_v2 = cgraph[v2];
+            const auto cluster_v1_size = cgraph[boost::graph_bundle].clusters[cluster_v1].size();
+            const auto cluster_v2_size = cgraph[boost::graph_bundle].clusters[cluster_v2].size();
+
+            return boost::out_degree(v1, cgraph) - cluster_v1_size > boost::out_degree(v2, cgraph) - cluster_v2_size;
+        };
+
+        return as::graph::acyclic_orientation(cgraph, vertex_order);
     }
 
     LineGraph sandwich_line_graph(const ClusteredGraph& cgraph) {
