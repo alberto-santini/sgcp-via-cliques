@@ -1,5 +1,5 @@
 find_path(PO_INCLUDE_DIR
-    NAMES po/ProgramOptions.hxx
+    NAMES ProgramOptions.hxx
     PATHS ${PO_ROOT_DIR}
     PATH_SUFFIXES include
 )

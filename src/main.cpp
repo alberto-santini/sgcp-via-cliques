@@ -6,7 +6,7 @@
 #include <as/graph.h>
 #include <as/max_clique.h>
 #include <as/and_die.h>
-#include <po/ProgramOptions.hxx>
+#include <ProgramOptions.hxx>
 #include <fstream>
 #include <chrono>
 #include <optional>

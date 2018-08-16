@@ -1,5 +1,5 @@
 find_path(PMC_INCLUDE_DIR
-    NAMES pmc/pmc.h
+    NAMES libpmc.h
     PATHS ${PMC_ROOT_DIR}
     PATH_SUFFIXES include
 )
