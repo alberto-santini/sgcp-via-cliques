@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7.1)
 project(sgcp_cliques VERSION 0.0.1 LANGUAGES CXX)
 
-set(SOURCES src/graph.cpp src/graph.h src/main.cpp)
+set(SOURCES src/graph.cpp src/graph.h src/main.cpp src/graph_weighted.h src/graph_weighted.cpp)
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(sgcp_cliques ${SOURCES})
