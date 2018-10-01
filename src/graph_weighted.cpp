@@ -155,9 +155,9 @@ namespace smwgcp_cliques {
     }
 
     DirectedGraph directed_acyclic(const ClusteredWeightedGraph& cwgraph) {
-        // True iff the first vertex has lower weight than the second vertex.
+        // True iff the first vertex has larger weight than the second vertex.
         const auto vertex_order = [&cwgraph] (const auto& v1, const auto& v2) -> bool {
-            return cwgraph[v1].weight < cwgraph[v2].weight;
+            return cwgraph[v1].weight > cwgraph[v2].weight;
         };
 
         return as::graph::acyclic_orientation(cwgraph, vertex_order);
