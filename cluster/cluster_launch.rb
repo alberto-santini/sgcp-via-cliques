@@ -26,6 +26,10 @@ OptionParser.new do |opts|
     opts.on('-t TIMEOUT', '--timeout', 'Cplex max clique timeout in seconds') do |timeout|
         @options[:timeout] = timeout.to_i
     end
+
+    opts.on('-w', '--[no-]weighted', 'Tell whether we are solving the weighted version') do |weighted|
+        @options[:weighted] = weighted
+    end
 end.parse!
 
 basename = File.basename(@options[:instance])
@@ -37,6 +41,13 @@ cls_file = "launch-#{basename}.sh"
 cmd =  "LD_LIBRARY_PATH=#{libraries.join(':')} #{exe} "
 cmd += "-g #{File.expand_path(@options[:instance])} "
 cmd += "-t #{@options[:timeout]} "
+
+if @options[:weighted]
+    cmd += "-y weighted "
+else
+    cmd += "-y unweighted"
+end
+
 cmd += "-o #{results_file}"
 
 script = <<~EOF
