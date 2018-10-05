@@ -78,27 +78,48 @@ int main(int argc, char* argv[]) {
         std::cerr << "Cannot access output file: " << output_file << and_die();
     }
 
-    auto solve_clique = [&] (const auto& clique_graph, const auto& n_partitions) -> void {
-        const auto start_time = high_resolution_clock::now();
-        const auto max_clique = as::max_clique::solve_with_mip(clique_graph, cplex_timeout);
-        const auto end_time = high_resolution_clock::now();
-        const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
-        const auto chromatic_n = n_partitions - max_clique.size();
-        const auto instance = fs::path{graph_file}.stem().string();
-
-        ofs << instance << "," << chromatic_n << "," << elapsed << "\n";
-    };
-
     if(parser["problem-type"].get().string == "unweighted") {
         const auto cgraph = sgcp_cliques::read_clustered_graph(graph_file);
         const auto working_graph = as::graph::complementary(cgraph);
         const auto clique_graph = sgcp_cliques::complementary_sandwich_line_graph(working_graph);
-        solve_clique(clique_graph, sgcp_cliques::number_of_partitions(cgraph));
+        const auto start_time = high_resolution_clock::now();
+        const auto max_clique = as::max_clique::solve_with_mip(clique_graph, cplex_timeout);
+        const auto end_time = high_resolution_clock::now();
+        const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
+        const auto chromatic_n = sgcp_cliques::number_of_partitions(cgraph) - max_clique.size();
+        const auto instance = fs::path{graph_file}.stem().string();
+
+        ofs << instance << "," << chromatic_n << "," << elapsed << "\n";
     } else if(parser["problem-type"].get().string == "weighted") {
+        const auto zero_time = high_resolution_clock::now();
+
+        std::cout << "Reading graph from file...\n";
+
         const auto cwgraph = smwgcp_cliques::read_clustered_weighted_graph(graph_file);
+
+        std::cout << "Graph read from file (" << duration_cast<duration<float>>(high_resolution_clock::now() - zero_time).count() << " s)\n";
+        std::cout << "Preparing Max-Weight Clique graph...\n";
+
         const auto working_graph = as::graph::complementary(cwgraph);
         const auto clique_graph = smwgcp_cliques::complementary_sandwich_line_graph(working_graph);
-        solve_clique(clique_graph,smwgcp_cliques::number_of_partitions(cwgraph));
+
+        std::cout << "Max-Weight Clique graph ready (" << duration_cast<duration<float>>(high_resolution_clock::now() - zero_time).count() << " s)\n";
+        std::cout << "Launching the Max-Weight Clique solver...\n";
+
+        const auto start_time = high_resolution_clock::now();
+        const auto max_clique = as::max_clique::solve_with_mip(clique_graph, cplex_timeout);
+        const auto end_time = high_resolution_clock::now();
+        const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
+
+        const auto max_clique_weight = std::accumulate(max_clique.begin(), max_clique.end(), 0.0f,
+           [&] (float acc, const auto& vertex) -> float {
+               return acc + cwgraph[vertex].weight;
+           }
+        );
+        const auto weighted_chromatic_n = smwgcp_cliques::sum_of_weights(cwgraph) - max_clique_weight;
+        const auto instance = fs::path{graph_file}.stem().string();
+
+        ofs << instance << "," << weighted_chromatic_n << "," << elapsed << "\n";
     } else {
         std::cerr << "Wrong problem type: " << parser["problem-type"].get().string << "\n";
         return 1;

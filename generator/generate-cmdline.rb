@@ -2,10 +2,13 @@ require 'optparse'
 require_relative 'generate-sgcp'
 
 @options = {
-    vertices:  100, # Number of vertices in the graph (larger than 0)
-    density:   0.5, # Graph density (between 0.0 and 1.0, extremes excluded)
-    part_sz:   0.1, # Average size of a partition as a fraction of the number of vertices (between 0.01 and 0.5)
-    file:  'g.txt'  # Output file
+    vertices:  100,    # Number of vertices in the graph (larger than 0)
+    density:   0.5,    # Graph density (between 0.0 and 1.0, extremes excluded)
+    part_sz:   0.1,    # Average size of a partition as a fraction of the number of vertices (between 0.01 and 0.5)
+    weighted: false,   # If true we generate an instance of the Selective Max Weight Colouring Problem
+    min_weight: 0.0,   # Minimum weight for weighted problems
+    max_weight: 100.0, # Maximum weight for weighted problems
+    file:  'g.txt'     # Output file
 }
 
 OptionParser.new do |opts|
@@ -28,6 +31,10 @@ OptionParser.new do |opts|
             throw "Invalid partition size #{s}: needs to be >= .01 and <= .5"
         end
         @options[:part_sz] = s.to_f
+    end
+
+    opts.on('-w', '--[no-]weights', 'Should weights be generated and associated to vertices?') do |w|
+        options[:weighted] = w
     end
 
     opts.on('-f FILE', '--file FILE', 'Output file') do |f|

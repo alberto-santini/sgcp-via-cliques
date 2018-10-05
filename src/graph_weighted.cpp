@@ -23,13 +23,13 @@ namespace smwgcp_cliques {
         }
 
         bool is_simplicial_pair(std::size_t v1, std::size_t v2, std::size_t w1, std::size_t w2, const DirectedGraph& dgraph) {
-            const auto [e, e_present] = boost::edge(
-                std::min(v1, v2), std::max(v1, v2), dgraph
-            );
+            const auto e_src = dgraph[v1].weight > dgraph[v2].weight ? v1 : v2;
+            const auto e_trg = dgraph[v1].weight < dgraph[v2].weight ? v1 : v2;
+            const auto f_src = dgraph[w1].weight > dgraph[w2].weight ? w1 : w2;
+            const auto f_trg = dgraph[w1].weight < dgraph[w2].weight ? w1 : w2;
 
-            const auto [f, f_present] = boost::edge(
-                std::min(w1, w2), std::max(w1, w2), dgraph
-            );
+            const auto [e, e_present] = boost::edge(e_src, e_trg, dgraph);
+            const auto [f, f_present] = boost::edge(f_src, f_trg, dgraph);
 
             (void) e_present, (void) f_present;
             assert(e_present && f_present);
@@ -45,6 +45,10 @@ namespace smwgcp_cliques {
 
             return false;
         }
+    }
+
+    float sum_of_weights(const ClusteredWeightedGraph& cwgraph) {
+        return std::accumulate(cwgraph[boost::graph_bundle].cluster_weights.begin(), cwgraph[boost::graph_bundle].cluster_weights.end(), 0.0f);
     }
 
     ClusteredWeightedGraph read_clustered_weighted_graph(std::string graph_file) {
@@ -73,9 +77,14 @@ namespace smwgcp_cliques {
         }
 
         ClusteredWeightedGraph graph;
-        std::vector<std::vector<std::size_t>> clusters(num_clusters);
 
         as::repeat(num_vertices, [&] () {
+            boost::add_vertex(ClusteredVertexProperties(), graph);
+        });
+
+        std::vector<float> cluster_weights;
+
+        as::repeat(num_clusters, [&] {
             float weight;
 
             if(!(ifs >> weight)) {
@@ -83,7 +92,7 @@ namespace smwgcp_cliques {
                 std::exit(1);
             }
 
-            boost::add_vertex(ClusteredVertexProperties(weight), graph);
+            cluster_weights.push_back(weight);
         });
 
         as::repeat(num_edges, [&] () {
@@ -102,6 +111,8 @@ namespace smwgcp_cliques {
 
         ifs >> std::ws;
 
+        std::vector<std::vector<std::size_t>> clusters(num_clusters);
+
         for(auto cluster = 0u; cluster < num_clusters; ++cluster) {
             std::getline(ifs, line);
             ss.str(line);
@@ -110,6 +121,7 @@ namespace smwgcp_cliques {
 
             while(ss >> vertex) {
                 graph[vertex].cluster = cluster;
+                graph[vertex].weight = cluster_weights[cluster];
                 clusters[cluster].push_back(vertex);
             }
 
@@ -117,7 +129,7 @@ namespace smwgcp_cliques {
             ss.clear();
         }
 
-        graph[boost::graph_bundle] = { num_clusters, clusters };
+        graph[boost::graph_bundle] = { num_clusters, clusters, cluster_weights };
         add_partition_cliques(graph);
 
         return graph;

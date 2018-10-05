@@ -23,9 +23,15 @@ def generate_instance(options)
     end
 
     File.open(options[:file], 'w') do |file|
-        file.puts options[:vertices]
+        file.puts n
         file.puts edges.size
         file.puts partitions.size
+
+        if options[:weighted]
+            partitions.size.times do
+                file.puts rand(options[:min_weight] .. options[:max_weight]).round(2)
+            end
+        end
 
         edges.each do |e|
             file.puts e.join(' ')

@@ -12,69 +12,73 @@
 #include <vector>
 
 namespace smwgcp_cliques {
-  // Properties of the clustered graph.
-  struct ClusteredGraphProperties {
-    // Number of clusters in the graph.
-    std::size_t num_clusters;
+    // Properties of the clustered graph.
+    struct ClusteredGraphProperties {
+        // Number of clusters in the graph.
+        std::size_t num_clusters;
 
-    // Actual clusters of the graph.
-    std::vector<std::vector<std::size_t>> clusters;
-  };
+        // Actual clusters of the graph.
+        std::vector<std::vector<std::size_t>> clusters;
 
-  // Properties of the vertices of the clustered graph.
-  struct ClusteredVertexProperties {
-    // The vertex belongs to this cluster.
-    std::size_t cluster;
+        // Weights associated with the clusters.
+        std::vector<float> cluster_weights;
+    };
 
-    // The vertex has this weight.
-    float weight;
+    // Properties of the vertices of the clustered graph.
+    struct ClusteredVertexProperties {
+        // The vertex belongs to this cluster.
+        std::size_t cluster;
 
-    explicit ClusteredVertexProperties(float weight) : cluster{0u}, weight{weight} {}
-    ClusteredVertexProperties() : cluster{0u}, weight{0.0f} {}
-  };
+        // Weight of the vertex (inherited from its cluster).
+        float weight;
 
-  // Underlying graph of the Selective Maximum Weight Graph Colouring Problem.
-  using ClusteredWeightedGraph = boost::adjacency_list<
-      boost::vecS, boost::vecS, boost::undirectedS,
-      ClusteredVertexProperties,
-      boost::no_property,
-      ClusteredGraphProperties
-  >;
+        explicit ClusteredVertexProperties(float weight) : cluster{0u}, weight{weight} {}
 
-  // Line graph of the original graph.
-  // It has a vertex for each edge of the original graph.
-  // It has an edge between two vertices if the corresponding edges in the
-  // original graph have one endpoint in a common cluster.
-  using LineGraph = boost::adjacency_list<
-      boost::vecS, boost::vecS, boost::undirectedS,
-      std::pair<std::size_t, std::size_t>
-  >;
+        ClusteredVertexProperties() : cluster{0u}, weight{0.0f} {}
+    };
 
-  // A sandwich line graph imposes the additional requirement that
-  // the edges in the original graph do not form a simplicial pair.
-  // Only in this case, the corresponding vertices in the line graph
-  // will be linked by an edge.
-  using SandwichLineGraph = LineGraph;
+    // Underlying graph of the Selective Maximum Weight Graph Colouring Problem.
+    using ClusteredWeightedGraph = boost::adjacency_list<
+        boost::vecS, boost::vecS, boost::undirectedS,
+        ClusteredVertexProperties,
+        boost::no_property,
+        ClusteredGraphProperties
+    >;
 
-  // An acyclic orientation of the ClusteredWeightedGraph.
-  using DirectedGraph = boost::adjacency_list<
-      boost::vecS, boost::vecS, boost::directedS,
-      ClusteredVertexProperties,
-      boost::no_property,
-      ClusteredGraphProperties
-  >;
+    // Line graph of the original graph.
+    // It has a vertex for each edge of the original graph.
+    // It has an edge between two vertices if the corresponding edges in the
+    // original graph have one endpoint in a common cluster.
+    using LineGraph = boost::adjacency_list<
+        boost::vecS, boost::vecS, boost::undirectedS,
+        std::pair<std::size_t, std::size_t>
+    >;
 
-  // Return the number of partitions, which is stored as a graph property.
-  inline std::size_t number_of_partitions(const ClusteredWeightedGraph& cwgraph) { return cwgraph[boost::graph_bundle].num_clusters; }
+    // A sandwich line graph imposes the additional requirement that
+    // the edges in the original graph do not form a simplicial pair.
+    // Only in this case, the corresponding vertices in the line graph
+    // will be linked by an edge.
+    using SandwichLineGraph = LineGraph;
 
-  // Reads a clustered weighted graph from file.
-  // First line: the number N of vertices;
-  // Second line: the number M of edges;
-  // Third line: the number P of clusters;
-  // Next N lines: the weights of the vertices;
-  // Next M lines: one edge per line, vertices are separated by one whitespace and numbered from 0 to N-1;
-  // Nest P lines: one cluster per line, same as above.
-  ClusteredWeightedGraph read_clustered_weighted_graph(std::string graph_file);
+    // An acyclic orientation of the ClusteredWeightedGraph.
+    using DirectedGraph = boost::adjacency_list<
+        boost::vecS, boost::vecS, boost::directedS,
+        ClusteredVertexProperties,
+        boost::no_property,
+        ClusteredGraphProperties
+    >;
+
+    // Return the sum of all weights of the vertices of a graph.
+    float sum_of_weights(const ClusteredWeightedGraph& cwgraph);
+
+    // Reads a clustered weighted graph from file.
+    // First line: the number N of vertices;
+    // Second line: the number M of edges;
+    // Third line: the number P of clusters;
+    // Next P lines: the weights of the clusters;
+    // Next M lines: one edge per line, vertices are separated by one whitespace and numbered from 0 to N-1;
+    // Nest P lines: one cluster per line, same as above.
+    ClusteredWeightedGraph read_clustered_weighted_graph(std::string graph_file);
 
     // Produces an acyclic orientation of the original graph, based on vertex weights.
     DirectedGraph directed_acyclic(const ClusteredWeightedGraph& cwgraph);
