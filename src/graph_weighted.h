@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <vector>
+#include <utility>
 
 namespace smwgcp_cliques {
     // Properties of the clustered graph.
@@ -45,13 +46,25 @@ namespace smwgcp_cliques {
         ClusteredGraphProperties
     >;
 
+    // Properties associated with LineGraph vertices.
+    struct LineGraphVertexProperty {
+        // First of the 2 vertices making up the edge in the original graph.
+        std::size_t vertex1;
+        // Second of the 2 vertices making up the edge in the original graph.
+        std::size_t vertex2;
+        // Weight of the heaviest of the 2 vertices making up the edge in the original graph.
+        float weight;
+    };
+
     // Line graph of the original graph.
     // It has a vertex for each edge of the original graph.
+    // The vertex in the line graph gets the highest of the weights of the two
+    // vertices making up the edge in the original graph.
     // It has an edge between two vertices if the corresponding edges in the
     // original graph have one endpoint in a common cluster.
     using LineGraph = boost::adjacency_list<
         boost::vecS, boost::vecS, boost::undirectedS,
-        std::pair<std::size_t, std::size_t>
+        LineGraphVertexProperty
     >;
 
     // A sandwich line graph imposes the additional requirement that
@@ -95,6 +108,11 @@ namespace smwgcp_cliques {
     // This is done to solve a max-clique problem instead of a
     // max-stable-set one.
     LineGraph complementary_sandwich_line_graph(const ClusteredWeightedGraph& cwgraph);
+
+    // Solves the MWSCP with a MIP model.
+    // Returns lower and upper bound at time limit.
+    // They coincide, if the optimal solution was found within the time limit.
+    std::pair<float, float> solve_with_mip(const ClusteredWeightedGraph& cwgraph);
 }
 
 #endif //SGCP_CLIQUES_GRAPH_WEIGHTED_H
