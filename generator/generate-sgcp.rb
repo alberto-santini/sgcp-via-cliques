@@ -29,7 +29,7 @@ def generate_instance(options)
 
         if options[:weighted]
             partitions.size.times do
-                file.puts rand(options[:min_weight] .. options[:max_weight]).round(2)
+                file.puts rand(options[:min_weight] .. options[:max_weight]).to_i
             end
         end
 
