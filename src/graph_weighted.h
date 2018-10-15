@@ -112,7 +112,7 @@ namespace smwgcp_cliques {
     // Solves the MWSCP with a MIP model.
     // Returns lower and upper bound at time limit.
     // They coincide, if the optimal solution was found within the time limit.
-    std::pair<float, float> solve_with_mip(const ClusteredWeightedGraph& cwgraph);
+    std::pair<float, float> solve_with_mip(const ClusteredWeightedGraph& cwgraph, float timeout);
 }
 
 #endif //SGCP_CLIQUES_GRAPH_WEIGHTED_H

@@ -229,7 +229,7 @@ namespace smwgcp_cliques {
         return as::graph::complementary(slgraph);
     }
 
-    std::pair<float, float> solve_with_mip(const ClusteredWeightedGraph& cwgraph) {
+    std::pair<float, float> solve_with_mip(const ClusteredWeightedGraph& cwgraph, float timeout) {
         IloEnv env;
         IloModel model(env);
 
@@ -285,7 +285,7 @@ namespace smwgcp_cliques {
         }
 
         IloCplex cplex(model);
-        cplex.setParam(IloCplex::TiLim, 10);
+        cplex.setParam(IloCplex::TiLim, timeout);
 
         try {
             if(cplex.solve()) {
