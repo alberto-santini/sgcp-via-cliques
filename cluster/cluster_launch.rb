@@ -9,11 +9,11 @@ libraries = [
 base_script = <<~EOF
 #!/bin/bash
 #SBATCH --partition=normal
-#SBATCH --time=2:00:00
+#SBATCH --time=10:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem-per-cpu=1024
+#SBATCH --mem-per-cpu=4096
 EOF
 
 @options = {}
@@ -43,12 +43,17 @@ cmd += "-g #{File.expand_path(@options[:instance])} "
 cmd += "-t #{@options[:timeout]} "
 
 if @options[:weighted]
-    cmd += "-y weighted "
-else
-    cmd += "-y unweighted"
-end
+    cmd += "-o #{results_file} "
+    cmd += '-y weighted-clique'
 
-cmd += "-o #{results_file}"
+    cmd_mip = cmd.gsub('weighted-clique', 'weighted-mip')
+    cmd_mip = cmd_mip.gsub('results-', 'results-mip-')
+
+    cmd += "\n#{cmd_mip}"
+else
+    cmd += "-o #{results_file} "
+    cmd += '-y unweighted'
+end
 
 script = <<~EOF
     #{base_script}

@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 
     parser["problem-type"]
         .abbreviation('y')
-        .description("Type of problem to solve. It can be either weighted or unweighted (default).")
+        .description("Type of problem to solve. It can be either weighted-clique, weighted-mip, or unweighted (default).")
         .type(po::string)
         .fallback("unweighted");
 
@@ -78,9 +78,10 @@ int main(int argc, char* argv[]) {
         std::cerr << "Cannot access output file: " << output_file << and_die();
     }
 
-    if(parser["problem-type"].get().string == "unweighted") {
-        const auto zero_time = high_resolution_clock::now();
+    const auto instance = fs::path{graph_file}.stem().string();
+    const auto zero_time = high_resolution_clock::now();
 
+    if(parser["problem-type"].get().string == "unweighted") {
         std::cout << "Reading graph from file...\n";
 
         const auto cgraph = sgcp_cliques::read_clustered_graph(graph_file);
@@ -100,12 +101,9 @@ int main(int argc, char* argv[]) {
         const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
         const auto chromatic_n_ub = sgcp_cliques::number_of_partitions(cgraph) - max_clique_sol.lb;
         const auto chromatic_n_lb = sgcp_cliques::number_of_partitions(cgraph) - max_clique_sol.ub;
-        const auto instance = fs::path{graph_file}.stem().string();
 
         ofs << instance << "," << chromatic_n_lb << "," << chromatic_n_ub << "," << elapsed << "\n";
-    } else if(parser["problem-type"].get().string == "weighted") {
-        const auto zero_time = high_resolution_clock::now();
-
+    } else if(parser["problem-type"].get().string == "weighted-clique") {
         std::cout << "Reading graph from file...\n";
 
         const auto cwgraph = smwgcp_cliques::read_clustered_weighted_graph(graph_file);
@@ -119,31 +117,37 @@ int main(int argc, char* argv[]) {
         std::cout << "Max-Weight Clique graph ready (" << duration_cast<duration<float>>(high_resolution_clock::now() - zero_time).count() << " s)\n";
         std::cout << "Launching the Max-Weight Clique solver...\n";
 
-        const auto start_time_clique = high_resolution_clock::now();
+        const auto start_time = high_resolution_clock::now();
         const auto max_clique_sol = as::max_clique::solve_with_mip(clique_graph, cplex_timeout);
-        const auto end_time_clique = high_resolution_clock::now();
-        const auto elapsed_clique = duration_cast<duration<float>>(end_time_clique - start_time_clique).count();
+        const auto end_time = high_resolution_clock::now();
+        const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
 
-        std::cout << "Clique solver finished (" << elapsed_clique << " s)\n";
+        std::cout << "Clique solver finished (" << elapsed << " s)\n";
 
-        const auto weighted_chromatic_n_ub = smwgcp_cliques::sum_of_weights(cwgraph) - max_clique_sol.lb;
         const auto weighted_chromatic_n_lb = smwgcp_cliques::sum_of_weights(cwgraph) - max_clique_sol.ub;
+        const auto weighted_chromatic_n_ub = smwgcp_cliques::sum_of_weights(cwgraph) - max_clique_sol.lb;
 
         std::cout << "Clique solver result (LB): " << weighted_chromatic_n_lb << " (" << smwgcp_cliques::sum_of_weights(cwgraph) << " - " << max_clique_sol.ub << ")\n";
         std::cout << "Clique solver result (UB): " << weighted_chromatic_n_ub << " (" << smwgcp_cliques::sum_of_weights(cwgraph) << " - " << max_clique_sol.lb << ")\n";
+
+        ofs << instance << "," << weighted_chromatic_n_lb << "," << weighted_chromatic_n_ub << "," << elapsed << "\n";
+    } else if(parser["problem-type"].get().string == "weighted-mip") {
+        std::cout << "Reading graph from file...\n";
+
+        const auto cwgraph = smwgcp_cliques::read_clustered_weighted_graph(graph_file);
+
+        std::cout << "Graph read from file (" << duration_cast<duration<float>>(high_resolution_clock::now() - zero_time).count() << " s)\n";
         std::cout << "Launching the MIP solver...\n";
 
-        const auto start_time_mip = high_resolution_clock::now();
+        const auto start_time = high_resolution_clock::now();
         const auto mip_result = smwgcp_cliques::solve_with_mip(cwgraph, cplex_timeout.value_or(3600.0f));
-        const auto end_time_mip = high_resolution_clock::now();
-        const auto elapsed_mip = duration_cast<duration<float>>(end_time_mip - start_time_mip).count();
+        const auto end_time = high_resolution_clock::now();
+        const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
 
-        std::cout << "MIP solver finished (" << elapsed_mip << " s)\n";
+        std::cout << "MIP solver finished (" << elapsed << " s)\n";
         std::cout << "MIP solver result: LB = " << mip_result.first << ", UB: " << mip_result.second << "\n";
-
-        const auto instance = fs::path{graph_file}.stem().string();
-        ofs << instance << "," << weighted_chromatic_n_lb << "," << weighted_chromatic_n_ub << ","
-            << elapsed_clique << "," << mip_result.first << "," << mip_result.second << "," << elapsed_mip << "\n";
+        
+        ofs << instance << "," << mip_result.first << "," << mip_result.second << "," << elapsed << "\n";
     } else {
         std::cerr << "Wrong problem type: " << parser["problem-type"].get().string << "\n";
         return 1;
