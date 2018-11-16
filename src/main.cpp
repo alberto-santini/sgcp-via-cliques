@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
         const auto chromatic_n_ub = sgcp_cliques::number_of_partitions(cgraph) - max_clique_sol.lb;
         const auto chromatic_n_lb = sgcp_cliques::number_of_partitions(cgraph) - max_clique_sol.ub;
 
-        ofs << instance << "," << chromatic_n_lb << "," << chromatic_n_ub << "," << elapsed << "\n";
+        ofs << "unweighted," << instance << "," << cgraph << "," << chromatic_n_lb << "," << chromatic_n_ub << "," << elapsed << "\n";
     } else if(parser["problem-type"].get().string == "weighted-clique") {
         std::cout << "Reading graph from file...\n";
 
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Clique solver result (LB): " << weighted_chromatic_n_lb << " (" << smwgcp_cliques::sum_of_weights(cwgraph) << " - " << max_clique_sol.ub << ")\n";
         std::cout << "Clique solver result (UB): " << weighted_chromatic_n_ub << " (" << smwgcp_cliques::sum_of_weights(cwgraph) << " - " << max_clique_sol.lb << ")\n";
 
-        ofs << instance << "," << weighted_chromatic_n_lb << "," << weighted_chromatic_n_ub << "," << elapsed << "\n";
+        ofs << "weighted-clique," << instance << "," << cwgraph << "," << weighted_chromatic_n_lb << "," << weighted_chromatic_n_ub << "," << elapsed << "\n";
     } else if(parser["problem-type"].get().string == "weighted-mip") {
         std::cout << "Reading graph from file...\n";
 
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
         std::cout << "MIP solver finished (" << elapsed << " s)\n";
         std::cout << "MIP solver result: LB = " << mip_result.first << ", UB: " << mip_result.second << "\n";
         
-        ofs << instance << "," << mip_result.first << "," << mip_result.second << "," << elapsed << "\n";
+        ofs << "weighted-mip," << instance << "," << cwgraph << "," << mip_result.first << "," << mip_result.second << "," << elapsed << "\n";
     } else {
         std::cerr << "Wrong problem type: " << parser["problem-type"].get().string << "\n";
         return 1;

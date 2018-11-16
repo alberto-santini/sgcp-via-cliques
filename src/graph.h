@@ -5,6 +5,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <cstddef>
+#include <iostream>
 #include <string>
 
 #ifndef SGCP_VIA_CLIQUES_GRAPH_H
@@ -72,6 +73,11 @@ namespace sgcp_cliques {
     // This is done to solve a max-clique problem instead of a
     // max-stable-set one.
     LineGraph complementary_sandwich_line_graph(const ClusteredGraph& cgraph);
+}
+
+inline std::ostream& operator<<(std::ostream& out, const sgcp_cliques::ClusteredGraph& g) {
+    out << boost::num_vertices(g) << "," << boost::num_edges(g) << "," << g[boost::graph_bundle].num_clusters;
+    return out;
 }
 
 #endif //SGCP_VIA_CLIQUES_GRAPH_H

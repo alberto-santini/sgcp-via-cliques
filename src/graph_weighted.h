@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <vector>
 #include <utility>
+#include <iostream>
 
 namespace smwgcp_cliques {
     // Properties of the clustered graph.
@@ -113,6 +114,11 @@ namespace smwgcp_cliques {
     // Returns lower and upper bound at time limit.
     // They coincide, if the optimal solution was found within the time limit.
     std::pair<float, float> solve_with_mip(const ClusteredWeightedGraph& cwgraph, float timeout);
+}
+
+inline std::ostream& operator<<(std::ostream& out, const smwgcp_cliques::ClusteredWeightedGraph& g) {
+    out << boost::num_vertices(g) << "," << boost::num_edges(g) << "," << g[boost::graph_bundle].num_clusters;
+    return out;
 }
 
 #endif //SGCP_CLIQUES_GRAPH_WEIGHTED_H

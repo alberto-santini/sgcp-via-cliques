@@ -13,7 +13,7 @@ base_script = <<~EOF
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem-per-cpu=4096
+#SBATCH --mem-per-cpu=32768
 EOF
 
 @options = {}
@@ -23,7 +23,7 @@ OptionParser.new do |opts|
         @options[:instance] = instance
     end
 
-    opts.on('-t TIMEOUT', '--timeout', 'Cplex max clique timeout in seconds') do |timeout|
+    opts.on('-t TIMEOUT', '--timeout', 'Cplex timeout in seconds') do |timeout|
         @options[:timeout] = timeout.to_i
     end
 
