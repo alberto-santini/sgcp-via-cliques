@@ -121,4 +121,9 @@ inline std::ostream& operator<<(std::ostream& out, const smwgcp_cliques::Cluster
     return out;
 }
 
+inline std::ostream& operator<<(std::ostream& out, const smwgcp_cliques::LineGraph& g) {
+    out << boost::num_vertices(g) << "," << boost::num_edges(g);
+    return out;
+}
+
 #endif //SGCP_CLIQUES_GRAPH_WEIGHTED_H

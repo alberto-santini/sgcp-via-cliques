@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Clique solver result (LB): " << weighted_chromatic_n_lb << " (" << smwgcp_cliques::sum_of_weights(cwgraph) << " - " << max_clique_sol.ub << ")\n";
         std::cout << "Clique solver result (UB): " << weighted_chromatic_n_ub << " (" << smwgcp_cliques::sum_of_weights(cwgraph) << " - " << max_clique_sol.lb << ")\n";
 
-        ofs << "weighted-clique," << instance << "," << cwgraph << "," << weighted_chromatic_n_lb << "," << weighted_chromatic_n_ub << "," << elapsed << "\n";
+        ofs << "weighted-clique," << instance << "," << cwgraph << "," << clique_graph << "," << weighted_chromatic_n_lb << "," << weighted_chromatic_n_ub << "," << elapsed << "\n";
     } else if(parser["problem-type"].get().string == "weighted-stable-set") {
         std::cout << "Reading graph from file...\n";
 
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
         const auto weighted_chromatic_n = smwgcp_cliques::sum_of_weights(cwgraph) - stable_set_result;
 
         std::cout << "Stable Set solver result: " << weighted_chromatic_n << " (" << smwgcp_cliques::sum_of_weights(cwgraph) << " - " << stable_set_result << ")\n";
-        ofs << "weighted-stable-set," << instance << "," << cwgraph << "," << weighted_chromatic_n << "," << elapsed << "\n";
+        ofs << "weighted-stable-set," << instance << "," << cwgraph << "," << mwss_graph << "," << weighted_chromatic_n << "," << elapsed << "\n";
     } else if(parser["problem-type"].get().string == "weighted-mip") {
         std::cout << "Reading graph from file...\n";
 
