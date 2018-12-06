@@ -18,6 +18,6 @@ endif()
 if(AS_FOUND AND NOT TARGET AS::AS)
     add_library(AS::AS INTERFACE IMPORTED)
     set_target_properties(AS::AS PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${AS_INCLUDE_DIR}"
+        INTERFACE_INCLUDE_DIRECTORIES "${AS_INCLUDE_DIRS}"
     )
 endif()

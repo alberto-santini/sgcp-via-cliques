@@ -18,6 +18,6 @@ endif()
 if(PO_FOUND AND NOT TARGET PO::PO)
     add_library(PO::PO INTERFACE IMPORTED)
     set_target_properties(PO::PO PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${PO_INCLUDE_DIR}"
+        INTERFACE_INCLUDE_DIRECTORIES "${PO_INCLUDE_DIRS}"
     )
 endif()

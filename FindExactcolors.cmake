@@ -1,0 +1,37 @@
+find_path(EXACTCOLORS_INCLUDE_DIR
+    NAMES exactcolors/mwis.h exactcolors/mwis_sewell/mwss.h
+    PATHS ${EXACTCOLORS_ROOT_DIR}
+    PATH_SUFFIXES include
+)
+
+find_library(EXACTCOLORS_LIBRARY
+    NAMES exactcolor
+    PATHS ${EXACTCOLOR_ROOT_DIR}
+    PATH_SUFFIXES lib lib64
+)
+
+find_library(SEWELL_LIBRARY
+    NAMES sewell
+    PATHS ${EXACTCOLOR_ROOT_DIR}
+    PATH_SUFFIXES lib lib64
+)
+
+mark_as_advanced(EXACTCOLORS_FOUND EXACTCOLORS_INCLUDE_DIR EXACTCOLORS_LIBRARY SEWELL_LIBRARY)
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(EXACTCOLORS
+    REQUIRED_VARS EXACTCOLORS_INCLUDE_DIR EXACTCOLORS_LIBRARY SEWELL_LIBRARY
+)
+
+if(EXACTCOLORS_FOUND)
+    set(EXACTCOLORS_INCLUDE_DIRS ${EXACTCOLORS_INCLUDE_DIR})
+    set(EXACTCOLORS_LIBRARIES ${EXACTCOLORS_LIBRARY} ${SEWELL_LIBRARY})
+endif()
+
+if(EXACTCOLORS_FOUND AND NOT TARGET Exactcolors::exactcolors)
+    add_library(Exactcolors::exactcolors INTERFACE IMPORTED)
+    set_target_properties(Exactcolors::exactcolors PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${EXACTCOLORS_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${EXACTCOLORS_LIBRARIES}"
+    )
+endif()
