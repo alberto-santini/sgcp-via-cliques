@@ -33,7 +33,7 @@ namespace smwgcp_cliques {
         bool vertex_order(const V& v1, const V& v2, const G& graph) {
             if(graph[v1].weight > graph[v2].weight) {
                 return true;
-            } else if(graph[v1].weight == graph[v2].weight) {
+            } else if(std::fabs(graph[v1].weight - graph[v2].weight) < 1.e-6f) { // Same weight
                 return v1 > v2;
             } else {
                 return false;

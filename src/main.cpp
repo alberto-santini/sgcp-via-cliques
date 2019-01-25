@@ -100,8 +100,8 @@ int main(int argc, char* argv[]) {
         const auto max_clique_sol = as::max_clique::solve_with_mip(clique_graph, cplex_timeout);
         const auto end_time = high_resolution_clock::now();
         const auto elapsed = duration_cast<duration<float>>(end_time - start_time).count();
-        const auto chromatic_n_ub = sgcp_cliques::number_of_partitions(cgraph) - max_clique_sol.lb;
-        const auto chromatic_n_lb = sgcp_cliques::number_of_partitions(cgraph) - max_clique_sol.ub;
+        const auto chromatic_n_ub = static_cast<float>(sgcp_cliques::number_of_partitions(cgraph)) - max_clique_sol.lb;
+        const auto chromatic_n_lb = static_cast<float>(sgcp_cliques::number_of_partitions(cgraph)) - max_clique_sol.ub;
 
         ofs << "unweighted," << instance << "," << cgraph << "," << chromatic_n_lb << "," << chromatic_n_ub << "," << elapsed << "\n";
     } else if(parser["problem-type"].get().string == "weighted-clique") {

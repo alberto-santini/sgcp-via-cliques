@@ -34,7 +34,7 @@ namespace smwgcp_cliques {
         // Weight of the vertex (inherited from its cluster).
         float weight;
 
-        explicit ClusteredVertexProperties(float weight) : cluster{0u}, weight{weight} {}
+        explicit ClusteredVertexProperties(float weight_) : cluster{0u}, weight{weight_} {}
 
         ClusteredVertexProperties() : cluster{0u}, weight{0.0f} {}
     };

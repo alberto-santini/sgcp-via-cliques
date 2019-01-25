@@ -6,7 +6,11 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(sgcp_cliques ${SOURCES})
 
-set(WARNING_OPTIONS      -Wall -Wextra -Werror -Wduplicated-cond -Wlogical-op -Wuseless-cast -Wrestrict)
+set(WARNING_OPTIONS      -Wall -Wextra -Werror -Wduplicated-cond -Wlogical-op -Wuseless-cast -Wrestrict
+                         -Wcast-qual -Wcast-align -Wstrict-aliasing=1 -Wpointer-arith -Winit-self
+                         -Wshadow -Wswitch-enum -Wredundant-decls -Wfloat-equal -Wundef -Wformat=2
+                         -Wvla -Wconversion -Wduplicated-branches -Wnull-dereference -Wold-style-cast
+                         -Wdouble-promotion)
 set(ARCH_OPTIONS         -mtune=native -march=native)
 
 set(MATH_OPTIONS         -fassociative-math -freciprocal-math -fno-signed-zeros -fno-trapping-math)
