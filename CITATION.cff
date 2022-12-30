@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Santini"
+  given-names: "Alberto"
+  orcid: "https://orcid.org/0000-0002-0440-0357"
+title: "Solving the (Weighted) Selective Graph Colouring Problem via Maximum Cliques"
+version: 1.0
+doi: 10.5281/zenodo.3338690
+date-released: 2019-07-17
+url: https://github.com/alberto-santini/sgcp-via-cliques
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Cornaz"
+    given-names: "Denis"
+  - family-names: "Furini"
+    given-names: "Fabio"
+  - family-names: "Malaguti"
+    given-names: "Enrico"
+  - family-names: "Santini"
+    given-names: "Alberto"
+    orcid: "https://orcid.org/0000-0002-0440-0357"
+  doi: 10.1016/j.orl.2019.08.005
+  journal: "Operations Research Letters
+  title: "A note on selective line-graphs and partition colorings"
+  year: 2019
+  volume: 47
+  issue: 6
+  start: 565
+  end: 568
